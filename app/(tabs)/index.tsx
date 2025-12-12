@@ -1,6 +1,8 @@
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl } from "react-native";
-import { API_BASE, USERNAME } from "../../apiConfig";
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
+import { API_BASE } from "../../apiConfig";
+import fetchWithAuth from "../lib/fetchWithAuth";
 
 type TransactionType = "income" | "expense";
 
@@ -14,7 +16,6 @@ type Transaction = {
 };
 
 type SummaryResponse = {
-  username: string;
   total_income: number;
   total_expense: number;
   balance: number;
@@ -26,14 +27,23 @@ export default function SummaryScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   async function fetchSummary() {
     try {
       setError(null);
-      const res = await fetch(`${API_BASE}/api/summary?username=${encodeURIComponent(USERNAME)}`);
+      const res = await fetchWithAuth(`${API_BASE}/api/summary`);
+      
+      if (res.status === 401) {
+        // fetchWithAuth ya maneja el clear y el alert
+        router.replace("/(auth)/login");
+        return;
+      }
+      
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
       }
+      
       const json = (await res.json()) as SummaryResponse;
       setData(json);
     } catch (err: any) {

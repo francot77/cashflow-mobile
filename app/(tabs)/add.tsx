@@ -1,15 +1,17 @@
-import { useState, useEffect } from "react";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
-  Pressable,
-  StyleSheet,
-  Alert,
-  ScrollView,
-  ActivityIndicator,
+  View,
 } from "react-native";
-import { API_BASE, USERNAME } from "../../apiConfig";
+import { API_BASE } from "../../apiConfig";
+import fetchWithAuth from "../lib/fetchWithAuth";
 
 type TransactionType = "income" | "expense";
 
@@ -28,18 +30,25 @@ export default function AddScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [catLoading, setCatLoading] = useState(true);
   const [catError, setCatError] = useState<string | null>(null);
+  
+  const router = useRouter();
 
   // Fetch categorías desde el backend
   useEffect(() => {
     async function fetchCategories() {
       try {
         setCatError(null);
-        const res = await fetch(
-          `${API_BASE}/api/categories?username=${encodeURIComponent(USERNAME)}`
-        );
+        const res = await fetchWithAuth(`${API_BASE}/api/categories`);
+        
+        if (res.status === 401) {
+          router.replace("/(auth)/login");
+          return;
+        }
+        
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}`);
         }
+        
         const json = await res.json();
         setCategories(json.categories || []);
       } catch (err) {
@@ -69,19 +78,21 @@ export default function AddScreen() {
       setLoading(true);
 
       const payload = {
-        username: USERNAME,
         amount: num,
         type,
         description,
-        category, // nombre de la categoría (igual que en web)
-        // date: new Date().toISOString().slice(0, 10), // si lo querés explícito
+        category,
       };
 
-      const res = await fetch(`${API_BASE}/api/transactions`, {
+      const res = await fetchWithAuth(`${API_BASE}/api/transactions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
+      if (res.status === 401) {
+        router.replace("/(auth)/login");
+        return;
+      }
 
       if (!res.ok) {
         const errorBody = await res.json().catch(() => ({}));
@@ -323,3 +334,4 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+

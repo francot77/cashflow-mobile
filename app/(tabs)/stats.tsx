@@ -1,14 +1,16 @@
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   ActivityIndicator,
-  ScrollView,
   Pressable,
   RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
-import { API_BASE, USERNAME } from "../../apiConfig";
+import { API_BASE } from "../../apiConfig";
+import fetchWithAuth from "../lib/fetchWithAuth";
 
 const COLOR_PALETTE = [
   "#2563eb",
@@ -59,22 +61,26 @@ export default function StatsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   async function fetchAnalytics(selectedRange: Range) {
     try {
       setError(null);
-      // loading sólo si no viene de pull-to-refresh
       if (!refreshing) {
         setLoading(true);
       }
 
-      const url = `${API_BASE}/api/analytics?username=${encodeURIComponent(
-        USERNAME
-      )}&range=${selectedRange}`;
+      const url = `${API_BASE}/api/analytics?range=${selectedRange}`;
 
       console.log("Fetching analytics from:", url);
 
-      const res = await fetch(url);
+      const res = await fetchWithAuth(url);
+      
+      if (res.status === 401) {
+        router.replace("/(auth)/login");
+        return;
+      }
+      
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || `HTTP ${res.status}`);
@@ -106,7 +112,6 @@ export default function StatsScreen() {
   const expensesByCategory = data?.expenses_by_category ?? [];
   const incomesByCategory = data?.incomes_by_category ?? [];
 
-  // máximos para normalizar
   const maxExpense = expensesByCategory.reduce(
     (max, c) => (c.total > max ? c.total : max),
     0
@@ -116,7 +121,6 @@ export default function StatsScreen() {
     0
   );
 
-  // máximo global para que las barras sean comparables
   const globalMax = Math.max(maxExpense, maxIncome, 0);
 
   return (
@@ -133,7 +137,6 @@ export default function StatsScreen() {
     >
       <Text style={styles.title}>Métricas</Text>
 
-      {/* Filtros de rango */}
       <View style={styles.rangeRow}>
         <RangeButton
           label="Mes"
@@ -170,7 +173,6 @@ export default function StatsScreen() {
         <>
           {error && <Text style={styles.error}>{error}</Text>}
 
-          {/* tarjetas de totales */}
           <View style={styles.cards}>
             <View style={[styles.card, styles.cardIncome]}>
               <Text style={styles.cardLabel}>Ingresos</Text>
@@ -194,7 +196,6 @@ export default function StatsScreen() {
             </View>
           </View>
 
-          {/* Egresos por categoría */}
           <Text style={styles.sectionTitle}>Egresos por categoría</Text>
 
           {expensesByCategory.length === 0 ? (
@@ -203,17 +204,12 @@ export default function StatsScreen() {
             </Text>
           ) : (
             expensesByCategory.map((cat) => {
-              const ratio =
-                globalMax > 0 ? cat.total / globalMax : 0;
-              // le bajo un toque el máximo para que ni la mayor llene TODO
+              const ratio = globalMax > 0 ? cat.total / globalMax : 0;
               const widthPercent = Math.max(ratio * 90, 8);
               const color = getColorForCategory(cat.category, "expense");
 
               return (
-                <View
-                  key={`expense-${cat.category}`}
-                  style={styles.barRow}
-                >
+                <View key={`expense-${cat.category}`} style={styles.barRow}>
                   <Text style={styles.barLabel}>{cat.category}</Text>
                   <View style={styles.barBackground}>
                     <View
@@ -234,7 +230,6 @@ export default function StatsScreen() {
             })
           )}
 
-          {/* Ingresos por categoría */}
           <Text style={[styles.sectionTitle, { marginTop: 16 }]}>
             Ingresos por categoría
           </Text>
@@ -245,16 +240,12 @@ export default function StatsScreen() {
             </Text>
           ) : (
             incomesByCategory.map((cat) => {
-              const ratio =
-                globalMax > 0 ? cat.total / globalMax : 0;
+              const ratio = globalMax > 0 ? cat.total / globalMax : 0;
               const widthPercent = Math.max(ratio * 90, 8);
               const color = getColorForCategory(cat.category, "income");
 
               return (
-                <View
-                  key={`income-${cat.category}`}
-                  style={styles.barRow}
-                >
+                <View key={`income-${cat.category}`} style={styles.barRow}>
                   <Text style={styles.barLabel}>{cat.category}</Text>
                   <View style={styles.barBackground}>
                     <View
