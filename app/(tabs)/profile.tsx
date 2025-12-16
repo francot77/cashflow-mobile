@@ -2,13 +2,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import useAuth from "../hooks/auth";
+import { useAuth } from "../contexts/AuthContext";
 import { getUsername } from "../lib/auth";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const [username, setUsername] = useState<string | null>(null);
-  const {logout} = useAuth();
+  const { logout } = useAuth();
+
   const handleAlertProx = () => {
     Alert.alert("Coming Soon", "This feature will be available in a future version.");
   };

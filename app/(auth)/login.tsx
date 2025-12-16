@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import useAuth from "../hooks/auth";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
@@ -9,6 +9,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const navigation = useRouter();
   const { login } = useAuth();
+
   const handleLogin = async () => {
     if (!username || !password) {
       Alert.alert("Missing Data", "Please enter username and password.");
@@ -19,7 +20,6 @@ export default function LoginScreen() {
       setLoading(true);
       const token = await login(username, password);
       if (!token) {
-        Alert.alert("Error", "Invalid server response");
         return;
       }
 

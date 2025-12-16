@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { API_BASE } from "../../apiConfig";
-import useAuth from "../hooks/auth";
+import { useAuth } from "../contexts/AuthContext";
 import fetchWithAuth from "../lib/fetchWithAuth";
 
 type TransactionType = "income" | "expense";
@@ -29,7 +29,8 @@ export default function SummaryScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const {isAuthenticated} = useAuth();
+  const { isAuthenticated } = useAuth();
+
   async function fetchSummary() {
     try {
       setError(null);
@@ -43,7 +44,7 @@ export default function SummaryScreen() {
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
       }
-      console.log("fetchSummary response", res);
+      
       const json = (await res.json()) as SummaryResponse;
       setData(json);
     } catch (err: any) {
@@ -56,13 +57,9 @@ export default function SummaryScreen() {
   }
 
   useEffect(() => {
-    console.log("isAuthenticated changed:", isAuthenticated);
-    const mountFetch = async () => {
-      if (isAuthenticated) {
-      await fetchSummary()
+    if (isAuthenticated) {
+      fetchSummary();
     }
-    }
-    mountFetch();
   }, [isAuthenticated]);
 
   const onRefresh = () => {
