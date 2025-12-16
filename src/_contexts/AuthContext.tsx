@@ -1,7 +1,7 @@
 import { API_BASE } from "@/apiConfig";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Alert } from "react-native";
-import { clearAuth, deleteToken, getToken, saveToken, saveUsername } from "../lib/auth";
+import { clearAuth, deleteToken, getToken, saveToken, saveUsername } from "../_lib/auth";
 
 interface AuthContextType {
   isAuthenticated: boolean;

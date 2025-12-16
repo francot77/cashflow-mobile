@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../src/_contexts/AuthContext";
 
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
@@ -31,11 +31,15 @@ export default function LoginScreen() {
       setLoading(false);
     }
   };
+  const hanldeRegister = async () => {
+    //browse to register page 
+
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign In</Text>
-
+      <Text style={styles.title}>Cashflow mobile app</Text>
+      <Text style={styles.subText}>Please sign in to continue.</Text>
       <Text style={styles.label}>Username</Text>
       <TextInput
         style={styles.input}
@@ -59,15 +63,17 @@ export default function LoginScreen() {
       <Pressable style={[styles.button, loading && { opacity: 0.6 }]} onPress={handleLogin} disabled={loading}>
         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign In</Text>}
       </Pressable>
+      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  subText: { color: "#aaa", marginBottom: 24 },
   container: { flex: 1, padding: 16, backgroundColor: "#0b0b0f", justifyContent: "center" },
-  title: { color: "#fff", fontSize: 22, fontWeight: "700", marginBottom: 16 },
+  title: { color: "#fff", fontSize: 22, fontWeight: "700", marginBottom: 16,alignSelf: "center" },
   label: { color: "#ccc", marginTop: 8, marginBottom: 4 },
   input: { backgroundColor: "#16161d", color: "#fff", padding: 10, borderRadius: 8 },
-  button: { backgroundColor: "#2563eb", padding: 12, borderRadius: 8, marginTop: 16, alignItems: "center" },
+  button: { backgroundColor: "#2563eb", padding: 12, borderRadius: 8, marginTop: 16, alignItems: "center",width: "30%", alignSelf: "center" },
   buttonText: { color: "#fff", fontWeight: "700" },
 });

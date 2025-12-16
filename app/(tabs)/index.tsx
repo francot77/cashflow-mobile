@@ -2,8 +2,8 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { API_BASE } from "../../apiConfig";
-import { useAuth } from "../contexts/AuthContext";
-import fetchWithAuth from "../lib/fetchWithAuth";
+import { useAuth } from "../../src/_contexts/AuthContext";
+import fetchWithAuth from "../../src/_lib/fetchWithAuth";
 
 type TransactionType = "income" | "expense";
 
@@ -152,6 +152,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     marginBottom: 12,
+    margin: "auto"
   },
   cardIncome: { backgroundColor: "#123d24" },
   cardExpense: { backgroundColor: "#3d1212" },

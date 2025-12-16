@@ -2,8 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useAuth } from "../contexts/AuthContext";
-import { getUsername } from "../lib/auth";
+import { useAuth } from "../../src/_contexts/AuthContext";
+import { getUsername } from "../../src/_lib/auth";
 
 export default function ProfileScreen() {
   const router = useRouter();

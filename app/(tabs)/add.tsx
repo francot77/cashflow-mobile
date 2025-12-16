@@ -12,7 +12,7 @@ import {
   View,
 } from "react-native";
 import { API_BASE } from "../../apiConfig";
-import fetchWithAuth from "../lib/fetchWithAuth";
+import fetchWithAuth from "../../src/_lib/fetchWithAuth";
 
 type TransactionType = "income" | "expense";
 

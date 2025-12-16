@@ -7,7 +7,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from '../src/_contexts/AuthContext';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
