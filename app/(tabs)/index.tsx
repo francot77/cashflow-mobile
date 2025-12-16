@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from "react-native";
 import { API_BASE } from "../../apiConfig";
+import useAuth from "../hooks/auth";
 import fetchWithAuth from "../lib/fetchWithAuth";
 
 type TransactionType = "income" | "expense";
@@ -28,14 +29,13 @@ export default function SummaryScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
+  const {isAuthenticated} = useAuth();
   async function fetchSummary() {
     try {
       setError(null);
       const res = await fetchWithAuth(`${API_BASE}/api/summary`);
       
       if (res.status === 401) {
-        // fetchWithAuth ya maneja el clear y el alert
         router.replace("/(auth)/login");
         return;
       }
@@ -43,12 +43,12 @@ export default function SummaryScreen() {
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
       }
-      
+      console.log("fetchSummary response", res);
       const json = (await res.json()) as SummaryResponse;
       setData(json);
     } catch (err: any) {
       console.error("Error fetching summary", err);
-      setError("No se pudo cargar el resumen");
+      setError("Could not load summary");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -56,8 +56,14 @@ export default function SummaryScreen() {
   }
 
   useEffect(() => {
-    fetchSummary();
-  }, []);
+    console.log("isAuthenticated changed:", isAuthenticated);
+    const mountFetch = async () => {
+      if (isAuthenticated) {
+      await fetchSummary()
+    }
+    }
+    mountFetch();
+  }, [isAuthenticated]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -93,7 +99,7 @@ export default function SummaryScreen() {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" />
-        <Text style={{ color: "#ccc", marginTop: 8 }}>Cargando...</Text>
+        <Text style={{ color: "#ccc", marginTop: 8 }}>Loading...</Text>
       </View>
     );
   }
@@ -104,11 +110,11 @@ export default function SummaryScreen() {
 
       <View style={styles.cards}>
         <View style={[styles.card, styles.cardIncome]}>
-          <Text style={styles.cardLabel}>Ingresos</Text>
+          <Text style={styles.cardLabel}>Income</Text>
           <Text style={styles.cardValue}>+ ${income.toFixed(2)}</Text>
         </View>
         <View style={[styles.card, styles.cardExpense]}>
-          <Text style={styles.cardLabel}>Egresos</Text>
+          <Text style={styles.cardLabel}>Expenses</Text>
           <Text style={styles.cardValue}>- ${expense.toFixed(2)}</Text>
         </View>
         <View style={[styles.card, balance >= 0 ? styles.cardIncome : styles.cardExpense]}>
@@ -120,7 +126,7 @@ export default function SummaryScreen() {
         </View>
       </View>
 
-      <Text style={styles.listTitle}>Movimientos</Text>
+      <Text style={styles.listTitle}>Transactions</Text>
       <FlatList
         data={transactions}
         keyExtractor={(item) => item.id.toString()}

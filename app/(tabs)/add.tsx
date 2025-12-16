@@ -1,3 +1,4 @@
+
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -33,7 +34,7 @@ export default function AddScreen() {
   
   const router = useRouter();
 
-  // Fetch categorías desde el backend
+  // Fetch categories from backend
   useEffect(() => {
     async function fetchCategories() {
       try {
@@ -52,8 +53,8 @@ export default function AddScreen() {
         const json = await res.json();
         setCategories(json.categories || []);
       } catch (err) {
-        console.error("Error cargando categorías", err);
-        setCatError("No se pudieron cargar las categorías");
+        console.error("Error loading categories", err);
+        setCatError("Could not load categories");
       } finally {
         setCatLoading(false);
       }
@@ -64,13 +65,13 @@ export default function AddScreen() {
 
   const handleSubmit = async () => {
     if (!amount || !description || !category || !type) {
-      Alert.alert("Faltan datos", "Completá todos los campos y elegí tipo.");
+      Alert.alert("Missing Data", "Complete all fields and select type.");
       return;
     }
 
     const num = Number(amount);
     if (isNaN(num) || num <= 0) {
-      Alert.alert("Monto inválido", "El monto debe ser mayor a 0.");
+      Alert.alert("Invalid Amount", "Amount must be greater than 0.");
       return;
     }
 
@@ -99,21 +100,21 @@ export default function AddScreen() {
         console.error("Error body:", errorBody);
         Alert.alert(
           "Error",
-          errorBody.error || `No se pudo guardar (HTTP ${res.status})`
+          errorBody.error || `Could not save (HTTP ${res.status})`
         );
         return;
       }
 
-      Alert.alert("OK", "Movimiento creado en el backend.");
+      Alert.alert("Success", "Transaction created successfully.");
 
-      // limpiar
+      // Clear form
       setAmount("");
       setDescription("");
       setCategory("");
       setType(null);
     } catch (err) {
-      console.error("Error creando transacción", err);
-      Alert.alert("Error", "No se pudo conectar al servidor.");
+      console.error("Error creating transaction", err);
+      Alert.alert("Error", "Could not connect to server.");
     } finally {
       setLoading(false);
     }
@@ -128,46 +129,46 @@ export default function AddScreen() {
       style={styles.container}
       contentContainerStyle={{ paddingBottom: 24 }}
     >
-      <Text style={styles.title}>Nuevo movimiento</Text>
+      <Text style={styles.title}>New Transaction</Text>
 
-      <Text style={styles.label}>Monto</Text>
+      <Text style={styles.label}>Amount</Text>
       <TextInput
         style={styles.input}
         value={amount}
         onChangeText={setAmount}
         keyboardType="numeric"
-        placeholder="Ej: 15000"
+        placeholder="e.g., 15000"
         placeholderTextColor="#666"
       />
 
-      <Text style={styles.label}>Descripción</Text>
+      <Text style={styles.label}>Description</Text>
       <TextInput
         style={styles.input}
         value={description}
         onChangeText={setDescription}
-        placeholder="Ej: sueldo, alquiler..."
+        placeholder="e.g., salary, rent..."
         placeholderTextColor="#666"
       />
 
-      <Text style={styles.label}>Categoría</Text>
+      <Text style={styles.label}>Category</Text>
       <TextInput
         style={styles.input}
         value={category}
         onChangeText={setCategory}
-        placeholder="Ej: Trabajo, Comida..."
+        placeholder="e.g., Work, Food..."
         placeholderTextColor="#666"
       />
 
       {catLoading ? (
         <View style={{ flexDirection: "row", alignItems: "center", marginTop: 6 }}>
           <ActivityIndicator size="small" />
-          <Text style={{ color: "#888", marginLeft: 8 }}>Cargando categorías...</Text>
+          <Text style={{ color: "#888", marginLeft: 8 }}>Loading categories...</Text>
         </View>
       ) : catError ? (
         <Text style={{ color: "#ff7b72", marginTop: 6 }}>{catError}</Text>
       ) : categories.length > 0 ? (
         <>
-          <Text style={styles.smallLabel}>Elegir una existente:</Text>
+          <Text style={styles.smallLabel}>Select existing category:</Text>
           <View style={styles.catChipsContainer}>
             {categories.map((cat) => (
               <Pressable
@@ -192,11 +193,11 @@ export default function AddScreen() {
         </>
       ) : (
         <Text style={{ color: "#888", marginTop: 6 }}>
-          No tenés categorías aún. Podés crear una escribiendo el nombre arriba.
+          No categories yet. You can create one by typing the name above.
         </Text>
       )}
 
-      <Text style={styles.label}>Tipo</Text>
+      <Text style={styles.label}>Type</Text>
       <View style={styles.typeRow}>
         <Pressable
           style={[
@@ -211,7 +212,7 @@ export default function AddScreen() {
               type === "income" && styles.typeTextActive,
             ]}
           >
-            + Ingreso
+            + Income
           </Text>
         </Pressable>
         <Pressable
@@ -227,7 +228,7 @@ export default function AddScreen() {
               type === "expense" && styles.typeTextActive,
             ]}
           >
-            - Egreso
+            - Expense
           </Text>
         </Pressable>
       </View>
@@ -238,7 +239,7 @@ export default function AddScreen() {
         disabled={loading}
       >
         <Text style={styles.submitText}>
-          {loading ? "Guardando..." : "Guardar"}
+          {loading ? "Saving..." : "Save"}
         </Text>
       </Pressable>
     </ScrollView>
@@ -334,4 +335,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-

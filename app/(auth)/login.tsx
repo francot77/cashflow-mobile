@@ -1,50 +1,32 @@
-// app/(auth)/login.tsx
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import { API_BASE } from "../../apiConfig";
-import { saveToken, saveUsername } from "../lib/auth";
+import useAuth from "../hooks/auth";
 
 export default function LoginScreen() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigation = useRouter();
+  const { login } = useAuth();
   const handleLogin = async () => {
     if (!username || !password) {
-      Alert.alert("Faltan datos", "Completá usuario y contraseña.");
+      Alert.alert("Missing Data", "Please enter username and password.");
       return;
     }
 
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        Alert.alert("Error", body.error || `HTTP ${res.status}`);
-        return;
-      }
-
-      const token = body.token;
-      console.log("Login response body:", body.token);
+      const token = await login(username, password);
       if (!token) {
-        Alert.alert("Error", "Respuesta inválida del servidor");
+        Alert.alert("Error", "Invalid server response");
         return;
       }
-
-      
-      await saveToken(token);
-      await saveUsername(username);
 
       navigation.replace("/(tabs)");
     } catch (err) {
       console.error("Login error", err);
-      Alert.alert("Error", "No se pudo conectar al servidor.");
+      Alert.alert("Error", "Could not connect to server.");
     } finally {
       setLoading(false);
     }
@@ -52,30 +34,30 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Iniciar sesión</Text>
+      <Text style={styles.title}>Sign In</Text>
 
-      <Text style={styles.label}>Usuario</Text>
+      <Text style={styles.label}>Username</Text>
       <TextInput
         style={styles.input}
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"
-        placeholder="usuario"
+        placeholder="username"
         placeholderTextColor="#666"
       />
 
-      <Text style={styles.label}>Contraseña</Text>
+      <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
-        placeholder="contraseña"
+        placeholder="password"
         placeholderTextColor="#666"
       />
 
       <Pressable style={[styles.button, loading && { opacity: 0.6 }]} onPress={handleLogin} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Entrar</Text>}
+        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Sign In</Text>}
       </Pressable>
     </View>
   );

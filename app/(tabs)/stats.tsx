@@ -135,23 +135,23 @@ export default function StatsScreen() {
         />
       }
     >
-      <Text style={styles.title}>Métricas</Text>
+      <Text style={styles.title}>Metrics</Text>
 
       <View style={styles.rangeRow}>
         <RangeButton
-          label="Mes"
+          label="Month"
           value="month"
           current={range}
           onPress={setRange}
         />
         <RangeButton
-          label="Año"
+          label="Year"
           value="year"
           current={range}
           onPress={setRange}
         />
         <RangeButton
-          label="Todo"
+          label="All"
           value="all"
           current={range}
           onPress={setRange}
@@ -175,11 +175,11 @@ export default function StatsScreen() {
 
           <View style={styles.cards}>
             <View style={[styles.card, styles.cardIncome]}>
-              <Text style={styles.cardLabel}>Ingresos</Text>
+              <Text style={styles.cardLabel}>Incomes</Text>
               <Text style={styles.cardValue}>+ ${income.toFixed(2)}</Text>
             </View>
             <View style={[styles.card, styles.cardExpense]}>
-              <Text style={styles.cardLabel}>Egresos</Text>
+              <Text style={styles.cardLabel}>Outcomes</Text>
               <Text style={styles.cardValue}>- ${expense.toFixed(2)}</Text>
             </View>
             <View
@@ -196,11 +196,11 @@ export default function StatsScreen() {
             </View>
           </View>
 
-          <Text style={styles.sectionTitle}>Egresos por categoría</Text>
+          <Text style={styles.sectionTitle}>Outcomes by category</Text>
 
           {expensesByCategory.length === 0 ? (
             <Text style={styles.emptyText}>
-              No hay egresos en este rango de fechas.
+              No hay Outcomes en este rango de fechas.
             </Text>
           ) : (
             expensesByCategory.map((cat) => {
@@ -231,12 +231,12 @@ export default function StatsScreen() {
           )}
 
           <Text style={[styles.sectionTitle, { marginTop: 16 }]}>
-            Ingresos por categoría
+            Incomes by category
           </Text>
 
           {incomesByCategory.length === 0 ? (
             <Text style={styles.emptyText}>
-              No hay ingresos en este rango de fechas.
+              No hay Incomes en este rango de fechas.
             </Text>
           ) : (
             incomesByCategory.map((cat) => {
